@@ -1,3 +1,4 @@
+<?php
 $conf['protocol'] = 'pgsql';
 $conf['server']   = 'localhost';
 $conf['user']     = 'dbuser';

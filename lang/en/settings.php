@@ -1,3 +1,4 @@
+<?php
 $lang['protocol'] = 'Database type of Django database';
 $lang['server']   = 'Hostname or file (sqlite) of Django database';
 $lang['user']     = 'Database username of Django database (empty for sqlite)';
