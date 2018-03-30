@@ -25,7 +25,6 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
      * @author    Robert Czechowski <zgtm at zgtm.de>
      */
     function auth_plugin_authdjango(){
-        global $conf;
         global $config_cascade;
         global $dbh;
 
@@ -35,11 +34,11 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         
         try {
             // Connecting, selecting database
-            if ($conf['auth']['django']['protocol'] == 'sqlite') {
-                $this->dbh = new PDO('sqlite:' . $conf['auth']['django']['server']);
+            if ($this->getConf('protocol') == 'sqlite') {
+                $this->dbh = new PDO('sqlite:' . $this->getConf('server'));
             }
             else {
-                $this->dbh = new PDO($conf['auth']['django']['protocol'] . ':host=' . $conf['auth']['django']['server'] . ';dbname=' . $conf['auth']['django']['db'], $conf['auth']['django']['user'], $conf['auth']['django']['password']);
+                $this->dbh = new PDO($this->getConf('protocol') . ':host=' . $this->getConf('server') . ';dbname=' . $this->getConf('db'), $this->getConf('user'), $this->getConf('password'));
             }    
             
         } catch (PDOException $e) {
