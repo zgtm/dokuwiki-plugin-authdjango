@@ -35,7 +35,13 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         
         try {
             // Connecting, selecting database
-            $this->dbh = new PDO($conf['auth']['django']['protocol'] . ':host=' . $conf['auth']['django']['server'] . ';dbname=' . $conf['auth']['django']['db'], $conf['auth']['django']['user'], $conf['auth']['django']['password']);
+            if ($conf['auth']['django']['protocol'] == 'sqlite') {
+                $this->dbh = new PDO('sqlite:' . $conf['auth']['django']['server']);
+            }
+            else {
+                $this->dbh = new PDO($conf['auth']['django']['protocol'] . ':host=' . $conf['auth']['django']['server'] . ';dbname=' . $conf['auth']['django']['db'], $conf['auth']['django']['user'], $conf['auth']['django']['password']);
+            }    
+            
         } catch (PDOException $e) {
             msg("Can not connect to database!", -1);
             $this->success = false;

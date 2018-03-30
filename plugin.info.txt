@@ -1,7 +1,7 @@
 base   authdjango
 author Robert Czechowski
 email  robert+dokuwiki@czecho.de
-date   2018-03-29
+date   2018-03-30
 name   Django authentication plugin
 desc   Allows for authentication using a django session
 url    https://www.dokuwiki.org/plugin:authdjango
