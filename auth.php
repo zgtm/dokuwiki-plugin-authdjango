@@ -69,10 +69,33 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
             $result = $this->dbh->query($query) or die('Query failed1: ' . $this->dbh->errorInfo());
             $ar = $result->fetch(PDO::FETCH_ASSOC);
             $session_data = $ar['session_data'];
-            // TODO: $session_data can now be empty if the session does not exist in database, handle correctly instead of just dying
 
-            //decrypting the session_data
-            $session_json = preg_split('/:/', base64_decode($session_data), 2)[1];
+            // TODO: $session_data can now be empty if the session does not exist in database, handle correctly instead of just dying
+            if (strlen($session_data) == 0) {
+                return false;
+            }
+
+            $compressed = false;
+
+            if (str_contains($session_data, ":")) {
+                // New django session encoding since django 4
+                if ($session_data[0] == '.') {
+                    $compressed = true;
+                    $session_data = substr($session_data, 1);
+                }
+
+                $session_json = base64_decode(strtr(preg_split('/:/', $session_data, 2)[0], "-_", "+/"), true);
+
+                if ($compressed) {
+                       $session_json = zlib_decode($session_json);
+                }
+
+            } else {
+                // Old django session enconding until django 3
+                // Decoding the session data:
+
+                $session_json = preg_split('/:/', base64_decode($session_data), 2)[1];
+            }
             $userid = json_decode($session_json, true)['_auth_user_id'];
             $query2 = 'SELECT username, first_name, last_name, email FROM auth_user WHERE id=' . $this->dbh->quote($userid) . ' LIMIT 1;';
 
