@@ -2,14 +2,11 @@
 /**
  * django auth backend
  *
- * Uses external trust mechanism to check against a django session id
- * Needs to run python3 to extract user from session data
- *
  * @author    Andreas Gohr <andi@splitbrain.org>
  * @author    Michael Luggen <michael.luggen at unifr.ch>
  * @author    Robert Czechowski <zgtm at zgtm.de>
  */
- 
+
 define('DOKU_AUTH', dirname(__FILE__));
 define('AUTH_USERFILE',DOKU_CONF.'users.auth.php');
 
