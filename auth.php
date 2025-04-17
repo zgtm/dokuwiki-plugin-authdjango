@@ -97,7 +97,7 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
                 $session_json = preg_split('/:/', base64_decode($session_data), 2)[1];
             }
             $userid = json_decode($session_json, true)['_auth_user_id'];
-            $query2 = 'SELECT username, first_name, last_name, email FROM auth_user WHERE id=' . $this->dbh->quote($userid) . ' LIMIT 1;';
+            $query2 = 'SELECT username, first_name, last_name, email is_superuser, is_staff FROM auth_user WHERE id=' . $this->dbh->quote($userid) . ' LIMIT 1;';
 
             $result2 = $this->dbh->query($query2) or die('Query failed2: ' . print_r($this->dbh->errorInfo()));
             $user = $result2->fetch(PDO::FETCH_ASSOC);
@@ -112,7 +112,12 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
             $USERINFO['name'] = $username;
             $USERINFO['pass'] = '';
             $USERINFO['mail'] = $useremail;
-            $groups[] = 'user';
+
+            if (($user['is_superuser'] && $this->getConf('admin_admin') == 1)
+                || ($user['is_staff'] && $this->getConf('staff_admin') == 1))
+            {
+                $groups[] = 'admin';
+            }
             $USERINFO['grps'] = $groups;
 
             $_SERVER['REMOTE_USER'] = $username;
@@ -129,11 +134,15 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         $query = 'SELECT auth_group.name FROM auth_user, auth_user_groups, auth_group where auth_user.username = ' . $this->dbh->quote($user) . ' AND auth_user.id = auth_user_groups.user_id AND auth_user_groups.group_id = auth_group.id;';
 
         $result = $this->dbh->query($query) or die('Query failed3: ' . $this->dbh->errorInfo());
-        $a = 0;
+
+        $groups = [];
         foreach ($result as $row) {
-            $groups[$a] = $row[0];
-            $a++;
+            $groups[] = $row[0];
         };
+
+        if (!in_array("user", $groups)) {
+            $groups[] = "user";
+        }
 
         return $groups;
     }
@@ -142,11 +151,19 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         $query = 'SELECT auth_group.name FROM auth_group';
 
         $result = $this->dbh->query($query) or die('Query failed4: ' . $this->dbh->errorInfo());
-        $a = 0;
+
+        $groups = [];
         foreach ($result as $row) {
-            $groups[$a] = $row[0];
-            $a++;
+            $groups[] = $row[0];
         };
+
+        if (!in_array("user", $groups)) {
+            $groups[] = "user";
+        }
+
+        if (!in_array("admin", $groups)) {
+            $groups[] = "admin";
+        }
 
         return $groups;
     }
