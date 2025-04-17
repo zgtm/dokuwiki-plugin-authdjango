@@ -21,7 +21,10 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
      * @author    Michael Luggen <michael.luggen at rhone.ch>
      * @author    Robert Czechowski <zgtm at zgtm.de>
      */
-    function auth_plugin_authdjango(){
+    public function __construct()
+    {
+        parent::__construct();
+
         global $config_cascade;
         global $dbh;
 
@@ -39,16 +42,15 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
             }
             else {
                 $this->dbh = new PDO($this->getConf('protocol') . ':host=' . $this->getConf('server') . ';dbname=' . $this->getConf('db'), $this->getConf('user'), $this->getConf('password'));
-            }    
-            
+            }
         } catch (PDOException $e) {
             msg("Can not connect to database!", -1);
+            dbg($e);
             $this->success = false;
         }
         $this->success = true;
     }
- 
-    
+
     function trustExternal($user,$pass,$sticky=false){
         global $USERINFO;
         global $conf;
@@ -60,6 +62,7 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
          * Just checks against the django sessionid variable,
          * gets user info from django-database
          */
+
         if (isset($_COOKIE['sessionid']) && $this->dbh) {
 
             $s_id =  $_COOKIE['sessionid'];
