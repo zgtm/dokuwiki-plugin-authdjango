@@ -27,8 +27,11 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
 
         $this->cando['external'] = true;
         $this->cando['getGroups'] = true;
-        $this->cando['logout'] = false;
-        
+
+        if (!empty($this->getConf('logoff_uri'))) {
+            $this->cando['logout'] = true;
+        }
+
         try {
             // Connecting, selecting database
             if ($this->getConf('protocol') == 'sqlite') {
@@ -124,6 +127,12 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
 
         return $groups;
     }
+
+    function logOff() {
+        header("Location: " . $this->getConf('logoff_uri'));
+        die();
+    }
+
 
     function __destruct() {
         $this->dbh = null;
