@@ -31,9 +31,7 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         $this->cando['external'] = true;
         $this->cando['getGroups'] = true;
 
-        if (!empty($this->getConf('logoff_uri'))) {
-            $this->cando['logout'] = true;
-        }
+        $this->cando['logout'] = !empty($this->getConf('logoff_uri'));
 
         try {
             // Connecting, selecting database
