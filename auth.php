@@ -49,6 +49,7 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         $this->success = true;
     }
 
+
     function trustExternal($user,$pass,$sticky=false){
         global $USERINFO;
         global $conf;
@@ -118,6 +119,15 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
                 || ($user['is_staff'] && $this->getConf('staff_admin') == 1))
             {
                 $groups[] = 'admin';
+            } else {
+                foreach ($this->getConf('groups_admin') as $admin_group) {
+                    foreach ($groups as $group) {
+                        if ($group == $admin_group && $group != "") {
+                            $groups[] = 'admin';
+                            break 2; // break both for loops
+                        }
+                    }
+                }
             }
             $USERINFO['grps'] = $groups;
 
@@ -148,6 +158,7 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
         return $groups;
     }
 
+
     function retrieveGroups($start=0,$limit=0){
         $query = 'SELECT auth_group.name FROM auth_group';
 
@@ -168,6 +179,7 @@ class auth_plugin_authdjango extends DokuWiki_Auth_Plugin  {
 
         return $groups;
     }
+
 
     function logOff() {
         header("Location: " . $this->getConf('logoff_uri'));
